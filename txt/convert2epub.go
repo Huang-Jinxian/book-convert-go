@@ -2,6 +2,7 @@ package txt
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -15,7 +16,7 @@ const (
 	epubFileTemplate        = `%s.epub`
 )
 
-func (book *txtBook) Convert2Epub(dstPath string) error {
+func (book *txtBook) Convert2Epub() error {
 	newBook, _ := epub.NewEpub(book.Title)
 	newBook.SetAuthor(book.Author)
 
@@ -45,7 +46,15 @@ func (book *txtBook) Convert2Epub(dstPath string) error {
 		}
 	}
 
+	dstPath := "./"
+	if book.DstFilePath != "" {
+		dstPath = book.DstFilePath
+	}
+	err := os.MkdirAll(dstPath, os.ModePerm)
+	if err != nil {
+		return err
+	}
 	destFile := path.Join(dstPath, fmt.Sprintf(epubFileTemplate, book.Title))
-	err := newBook.Write(destFile)
+	err = newBook.Write(destFile)
 	return err
 }

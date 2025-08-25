@@ -20,6 +20,8 @@ type txtBook struct {
 	Chapters []chapter
 
 	FileEncoding encoding.Encoding
+
+	DstFilePath string
 }
 
 type chapter struct {
@@ -33,6 +35,10 @@ func NewTxtBook(title string, author string, filePath string, coverPath string, 
 
 func (book *txtBook) SetFileEncoding(enc encoding.Encoding) {
 	book.FileEncoding = enc
+}
+
+func (book *txtBook) SetDstFilePath(dstFilePath string) {
+	book.DstFilePath = dstFilePath
 }
 
 func (book *txtBook) Parse() error {
