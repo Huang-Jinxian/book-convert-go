@@ -3,8 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
+	convert "github.com/Huang-Jinxian/book-convert-go"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/unicode"
 )
 
 var (
@@ -22,23 +28,21 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "book_convert",
 	Short: "Convert book between txt，epub and azw3",
-	Long: `Book Convert is a CLI that helps you to convert your book.
+	Long: `Book Convert is a CLI that helps you to convertBook your book.
 Support book type includes txt, epub and azw3.`,
 }
 
 var convertCmd = &cobra.Command{
-	Use:   "convert",
+	Use:   "convertBook",
 	Short: "Convert txt book to epub book",
 	Long:  `Convert txt book to epub book.`,
-	Args:  cobra.MinimumNArgs(1),
-	Run:   convert,
+	Run:   convertBook,
 }
 
 var webCmd = &cobra.Command{
 	Use:   "web [-p port]",
 	Short: "start web server",
 	Long:  `#todo need to implement the webServer func`,
-	Args:  cobra.MinimumNArgs(1),
 	Run:   webServer,
 }
 
@@ -58,8 +62,23 @@ func init() {
 	rootCmd.AddCommand(webCmd)
 }
 
-func convert(cmd *cobra.Command, args []string) {
-	fmt.Println(title, author, coverPath, chapterTitleReg, fileEncoding, filePath, destPath)
+func convertBook(cmd *cobra.Command, args []string) {
+	var reg *regexp.Regexp
+	if chapterTitleReg != "" {
+		reg = regexp.MustCompile(chapterTitleReg)
+	}
+
+	var enc encoding.Encoding
+	switch strings.ToUpper(fileEncoding) {
+	case "GB18030":
+		enc = simplifiedchinese.GB18030
+	case "UTF8":
+		enc = unicode.UTF8
+	}
+	err := convert.Convert(title, author, filePath, coverPath, reg, enc, destPath)
+	if err != nil {
+		return
+	}
 }
 
 func webServer(cmd *cobra.Command, args []string) {
